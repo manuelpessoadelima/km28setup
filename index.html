@@ -3,9 +3,488 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#111110" media="(prefers-color-scheme: dark)">
+    <title>KM28 Night Shift</title>
+    <meta name="description" content="Step-by-step guide for running a night shift at KM28.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fafaf7;
+            --surface: #ffffff;
+            --text: #1a1a18;
+            --muted: #6b6b66;
+            --line: #e6e5df;
+            --accent: #d9481c;
+            --accent-soft: #fbe9e2;
+            --nav-h: 64px;
+            --gutter: 20px;
+            --radius: 16px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #111110;
+                --surface: #1b1b19;
+                --text: #f1f0eb;
+                --muted: #a3a29b;
+                --line: #2e2e2b;
+                --accent: #ff7a4d;
+                --accent-soft: #3a2119;
+            }
+            .drawing img { filter: invert(0.92) hue-rotate(180deg) contrast(0.9); }
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+            font-size: 1.25rem;          /* 20px */
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ---------- Sticky nav ---------- */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            height: var(--nav-h);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 var(--gutter);
+            background: color-mix(in srgb, var(--bg) 88%, transparent);
+            backdrop-filter: saturate(1.4) blur(14px);
+            -webkit-backdrop-filter: saturate(1.4) blur(14px);
+            border-bottom: 1px solid var(--line);
+        }
+        .nav__brand {
+            flex: none;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .nav__brand span { color: var(--accent); }
+        .nav__links {
+            display: flex;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            min-width: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 24px), transparent 100%);
+            padding-inline: 12px 24px;
+        }
+        .nav__links::-webkit-scrollbar { display: none; }
+        .nav__links a {
+            display: block;
+            white-space: nowrap;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--muted);
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav__links a:hover { color: var(--text); }
+        .nav__links a.is-active {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        /* ---------- Layout ---------- */
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 var(--gutter) 160px;
+        }
+        .hero { padding: 72px 0 40px; }
+        .hero__kicker {
+            margin: 0 0 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+        h2, h3 { overflow-wrap: break-word; }
+        h1 {
+            margin: 0;
+            font-size: clamp(2.6rem, 11vw, 4.5rem);
+            line-height: 1.05;
+            font-weight: 800;
+            letter-spacing: -0.035em;
+        }
+        .hero p { margin: 24px 0 0; color: var(--muted); max-width: 32ch; }
+
+        section {
+            padding: 88px 0 0;
+            scroll-margin-top: calc(var(--nav-h) + 8px);
+        }
+        .section__num {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+        }
+        h2 {
+            margin: 0 0 32px;
+            font-size: clamp(2rem, 8vw, 2.75rem);
+            line-height: 1.15;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+        h3 {
+            margin: 56px 0 16px;
+            font-size: 1.5rem;
+            line-height: 1.3;
+            font-weight: 700;
+            letter-spacing: -0.015em;
+        }
+        h3:first-of-type { margin-top: 0; }
+        p { margin: 0 0 24px; }
+        .muted { color: var(--muted); }
+
+        /* ---------- Checklists ---------- */
+        .checklist {
+            margin: 0 0 24px;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 12px;
+        }
+        .checklist li {
+            position: relative;
+            padding: 18px 20px 18px 60px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            line-height: 1.5;
+        }
+        .checklist li::before {
+            content: "";
+            position: absolute;
+            left: 20px;
+            top: 21px;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--accent);
+            border-radius: 7px;
+        }
+
+        /* Numbered steps (show cues) */
+        .steps { counter-reset: step; }
+        .steps li { counter-increment: step; }
+        .steps li::before {
+            content: counter(step);
+            display: grid;
+            place-items: center;
+            border: none;
+            border-radius: 999px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Key → value list (cups) */
+        .pairs {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-top: 1px solid var(--line);
+        }
+        .pairs li {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 22px 0;
+            border-bottom: 1px solid var(--line);
+            line-height: 1.4;
+        }
+        .pairs strong { font-weight: 700; }
+        .pairs span { color: var(--muted); }
+
+        /* Callouts */
+        .note {
+            margin: 32px 0;
+            padding: 24px;
+            border-left: 4px solid var(--accent);
+            background: var(--accent-soft);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            line-height: 1.6;
+        }
+        .note p:last-child { margin-bottom: 0; }
+
+        /* Drawings */
+        .drawing { margin: 32px 0 48px; }
+        .drawing img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+        }
+        .drawing figcaption {
+            margin-top: 14px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+        .drawing--bad figcaption::before { content: "✕  "; color: var(--accent); font-weight: 700; }
+        .drawing--good figcaption::before { content: "✓  "; color: #2f8f4e; font-weight: 700; }
+
+        footer {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px var(--gutter) 64px;
+            border-top: 1px solid var(--line);
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        @media (min-width: 768px) {
+            :root { --nav-h: 72px; --gutter: 40px; }
+            body { font-size: 1.375rem; }     /* 22px */
+            .hero { padding: 120px 0 56px; }
+            section { padding-top: 120px; }
+            .pairs li { flex-direction: row; justify-content: space-between; gap: 24px; }
+            .pairs span { text-align: right; }
+        }
+    </style>
 </head>
 <body>
-    <p>test</p>
+
+    <nav class="nav" aria-label="Sections">
+        <a class="nav__brand" href="#top">KM28<span>.</span></a>
+        <ul class="nav__links">
+            <li><a href="#opening">Opening</a></li>
+            <li><a href="#stage">Stage</a></li>
+            <li><a href="#lights">Lights</a></li>
+            <li><a href="#chairs">Chairs</a></li>
+            <li><a href="#sound">Sound</a></li>
+            <li><a href="#merch">Merch</a></li>
+            <li><a href="#bar">Bar</a></li>
+            <li><a href="#show">Show</a></li>
+            <li><a href="#payout">Payout</a></li>
+            <li><a href="#checkout">Check out</a></li>
+        </ul>
+    </nav>
+
+    <main id="top">
+        <header class="hero">
+            <p class="hero__kicker">Night shift guide</p>
+            <h1>KM28 Night Shift</h1>
+            <p>Everything to do on a show night, from opening up to locking down.</p>
+        </header>
+
+        <section id="opening">
+            <span class="section__num">01</span>
+            <h2>Opening housekeeping</h2>
+            <ul class="checklist">
+                <li>Switch the electricity on</li>
+                <li>Wipe the toilets</li>
+                <li>Throw the trash out</li>
+                <li>Take the cases of empty beers downstairs and bring missing beverages upstairs</li>
+            </ul>
+        </section>
+
+        <section id="stage">
+            <span class="section__num">02</span>
+            <h2>Performer &amp; speakers</h2>
+            <p>The stage front is <strong>inclined at 45°</strong>, not facing straight.</p>
+            <ul class="checklist">
+                <li>Angle the speakers to match the 45° stage front</li>
+            </ul>
+        </section>
+
+        <section id="lights">
+            <span class="section__num">03</span>
+            <h2>Lights</h2>
+
+            <div class="note">
+                <p>Make sure the performers are on stage, then take the <strong>silver ladder</strong> and position the lights while they are there.</p>
+            </div>
+
+            <h3>Clear reflectors (no color)</h3>
+            <p>Each reflector has three handles:</p>
+            <ul class="checklist">
+                <li><strong>X axis</strong> — left / right</li>
+                <li><strong>Y axis</strong> — up / down</li>
+                <li><strong>Focus radius</strong> — bigger or smaller spot</li>
+            </ul>
+            <p>The pair of reflectors should light the performers' faces without hard shadows, each one at about <strong>45°</strong> from the face.</p>
+            <ul class="checklist">
+                <li><strong>Solo performer:</strong> use the smallest focus radius</li>
+                <li><strong>Bigger groups:</strong> distribute the light sources equally</li>
+            </ul>
+
+            <h3>Accent color LED</h3>
+            <p>The color LED only has the X and Y axis.</p>
+            <ul class="checklist">
+                <li><strong>Solo performer:</strong> point it at the ceiling for a decorative effect</li>
+                <li><strong>Larger groups:</strong> point it at the performers, adding to an even light together with the clear reflectors</li>
+            </ul>
+        </section>
+
+        <section id="chairs">
+            <span class="section__num">04</span>
+            <h2>Chairs</h2>
+
+            <ul class="checklist">
+                <li>Front chairs go <strong>close and parallel</strong> to the stage</li>
+            </ul>
+            <figure class="drawing drawing--good">
+                <img src="img/web/chair_positioning_right.jpg" width="1400" height="880" loading="lazy"
+                     alt="Floor plan: straight rows of chairs parallel to the stage on the right, angled rows on the left, with a bench and small tables at the back.">
+                <figcaption>Right: front rows straight and parallel to the stage.</figcaption>
+            </figure>
+
+            <ul class="checklist">
+                <li>Don't make a uniform half moon — it loses seats</li>
+            </ul>
+            <figure class="drawing drawing--bad">
+                <img src="img/web/uniform_half_moon.jpg" width="1400" height="1095" loading="lazy"
+                     alt="Floor plan crossed out in red: chairs in curved half-moon rows, leaving lost space next to the stage.">
+                <figcaption>Wrong: a uniform half moon leaves lost space.</figcaption>
+            </figure>
+
+            <ul class="checklist">
+                <li>Keep a walking route to the back of the side audience</li>
+            </ul>
+            <figure class="drawing">
+                <img src="img/web/walking_routes.jpg" width="1400" height="859" loading="lazy"
+                     alt="Floor plan: walking routes from the entrance around the chair blocks and the column to the back of the side seating.">
+                <figcaption>Walking routes from the entrance, around the column, to the back seats.</figcaption>
+            </figure>
+        </section>
+
+        <section id="sound">
+            <span class="section__num">05</span>
+            <h2>Sound check</h2>
+            <ul class="checklist">
+                <li>Soundcheck with the <strong>Soundcraft tablet</strong></li>
+                <li>Check recording levels of the stereo mic pair and the stereo line-in (on the device at the bar)</li>
+            </ul>
+        </section>
+
+        <section id="merch">
+            <span class="section__num">06</span>
+            <h2>Artist's merch</h2>
+            <p class="muted">Notes for merch placement are still to be added.</p>
+        </section>
+
+        <section id="bar">
+            <span class="section__num">07</span>
+            <h2>Running the bar</h2>
+            <p>Which cup for which drink:</p>
+            <ul class="pairs">
+                <li><strong>Water &amp; wine</strong><span>Small cup</span></li>
+                <li><strong>Hard liquor</strong><span>Rugged cup</span></li>
+                <li><strong>Small beers</strong><span>No cup</span></li>
+                <li><strong>Beers without foam</strong><span>Small beer cup</span></li>
+                <li><strong>Beers with more foam</strong><span>Big beer cup</span></li>
+            </ul>
+        </section>
+
+        <section id="show">
+            <span class="section__num">08</span>
+            <h2>During the show</h2>
+
+            <h3>Just before the show starts</h3>
+            <ol class="checklist steps">
+                <li>Start recording</li>
+                <li>Switch off the room lights</li>
+                <li>Fade out the bar lights</li>
+                <li>Announce the artist — <strong>before</strong> they are on stage</li>
+            </ol>
+
+            <h3>Just after the first set ends</h3>
+            <ol class="checklist steps">
+                <li>Stop recording the set</li>
+                <li>Performer announces the break</li>
+                <li>Fade in the bar lights</li>
+                <li>Switch on the room lights</li>
+                <li>Dim the stage lights</li>
+                <li>Put on music</li>
+            </ol>
+
+            <h3>Just before the second set starts</h3>
+            <ol class="checklist steps">
+                <li>Begin recording the set</li>
+                <li>Switch off the room lights</li>
+                <li>Fade out the bar lights</li>
+                <li>Bring up the stage light level</li>
+                <li>Give out the musicians' money</li>
+            </ol>
+
+            <h3>After the last set ends</h3>
+            <ol class="checklist steps">
+                <li>Stop recording the set</li>
+                <li>Fade in the bar lights</li>
+                <li>Put on music</li>
+                <li>Dim the stage lights</li>
+            </ol>
+        </section>
+
+        <section id="payout">
+            <span class="section__num">09</span>
+            <h2>Pay the musicians</h2>
+            <ul class="checklist">
+                <li>Once the bar movement calms down, pay out the musicians</li>
+            </ul>
+        </section>
+
+        <section id="checkout">
+            <span class="section__num">10</span>
+            <h2>Check out</h2>
+            <ul class="checklist">
+                <li>Fill out the necessary forms</li>
+                <li>Turn the turntable sound system off</li>
+                <li>Put the empty bottles away in the corridor</li>
+                <li>Clean the toilets</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>KM28 · Night shift notes</footer>
+
+    <script>
+        // Highlight the nav link of the section currently in view.
+        const links = document.querySelectorAll('.nav__links a');
+        const byId = new Map([...links].map(a => [a.hash.slice(1), a]));
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                links.forEach(a => a.classList.remove('is-active'));
+                const link = byId.get(entry.target.id);
+                if (link) {
+                    link.classList.add('is-active');
+                    // Scroll only the nav strip, never the page.
+                    const strip = link.closest('.nav__links');
+                    strip.scrollTo({ left: link.offsetLeft - strip.offsetLeft - (strip.clientWidth - link.offsetWidth) / 2, behavior: 'smooth' });
+                }
+            });
+        }, { rootMargin: '-30% 0px -60% 0px' });
+
+        document.querySelectorAll('main section').forEach(s => observer.observe(s));
+    </script>
 </body>
 </html>
